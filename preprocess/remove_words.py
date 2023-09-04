@@ -83,7 +83,7 @@ with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
             max_len = len(temp)
 
 aver_len = 1.0 * aver_len / len(lines)
-print('Number of lines:' + len(lines))
+print('Number of lines:' + str(len(lines)))
 print('Min_len : ' + str(min_len))
 print('Max_len : ' + str(max_len))
 print('Average_len : ' + str(aver_len))
