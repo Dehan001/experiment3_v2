@@ -119,8 +119,10 @@ def construct_graph(adjacency):
     g.ndata['d'] = torch.from_numpy(adjd.astype(np.float32))
     g.edata['w'] = weight
 
+    # if args.cuda:
+    #     g.to(torch.device('cuda:0'))
     if args.cuda:
-        g.to(torch.device('cuda:0'))
+        g = g.to(torch.device('cuda:0'))
 
     return g
 
