@@ -20,22 +20,15 @@ if len(sys.argv) != 2:
 	sys.exit("Use: python build_graph.py <dataset>")
 
 datasets = ['SentNOB', 'mr']
-# build corpus
 dataset = sys.argv[1]
 
 if dataset not in datasets:
 	sys.exit("wrong dataset name")
 
-# Read Word Vectors
-# word_vector_file = 'data/glove.6B/glove.6B.300d.txt'
-# word_vector_file = 'data/corpus/' + dataset + '_word_vectors.txt'
-#_, embd, word_vector_map = loadWord2Vec(word_vector_file)
-# word_embeddings_dim = len(embd[0])
-
 word_embeddings_dim = 300
 word_vector_map = {}
 
-# shulffing
+
 doc_name_list = []
 doc_train_list = []
 doc_test_list = []
@@ -49,15 +42,14 @@ with open('../data/' + dataset + '.txt', 'r') as f:
             doc_test_list.append(line.strip())
         elif temp[1].find('train') != -1:
             doc_train_list.append(line.strip())
-# print(doc_train_list)
-# print(doc_test_list)
+
 
 doc_content_list = []
 with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
     lines = f.readlines()
     for line in lines:
         doc_content_list.append(line.strip())
-# print(doc_content_list)
+
 
 print(len(doc_name_list))
 print(len(doc_content_list))
@@ -69,8 +61,6 @@ for train_name in doc_train_list:
 print(train_ids)
 random.shuffle(train_ids)
 
-# partial labeled data
-#train_ids = train_ids[:int(0.2 * len(train_ids))]
 
 train_ids_str = '\n'.join(str(index) for index in train_ids)
 with open('../data/' + dataset + '.train.index', 'w') as f:
@@ -109,7 +99,7 @@ with open('../data/corpus/' + dataset + '_shuffle.txt', 'w') as f:
     f.write(shuffle_doc_words_str)
 
 
-# build vocab
+
 word_freq = {}
 word_set = set()
 for doc_words in shuffle_doc_words_list:
@@ -154,65 +144,6 @@ vocab_str = '\n'.join(vocab)
 with open('../data/corpus/' + dataset + '_vocab.txt', 'w') as f:
     f.write(vocab_str)
 
-
-'''
-Word definitions begin
-'''
-'''
-definitions = []
-
-for word in vocab:
-    word = word.strip()
-    synsets = wn.synsets(clean_str(word))
-    word_defs = []
-    for synset in synsets:
-        syn_def = synset.definition()
-        word_defs.append(syn_def)
-    word_des = ' '.join(word_defs)
-    if word_des == '':
-        word_des = '<PAD>'
-    definitions.append(word_des)
-
-string = '\n'.join(definitions)
-
-
-f = open('data/corpus/' + dataset + '_vocab_def.txt', 'w')
-f.write(string)
-f.close()
-
-tfidf_vec = TfidfVectorizer(max_features=1000)
-tfidf_matrix = tfidf_vec.fit_transform(definitions)
-tfidf_matrix_array = tfidf_matrix.toarray()
-print(tfidf_matrix_array[0], len(tfidf_matrix_array[0]))
-
-word_vectors = []
-
-for i in range(len(vocab)):
-    word = vocab[i]
-    vector = tfidf_matrix_array[i]
-    str_vector = []
-    for j in range(len(vector)):
-        str_vector.append(str(vector[j]))
-    temp = ' '.join(str_vector)
-    word_vector = word + ' ' + temp
-    word_vectors.append(word_vector)
-
-string = '\n'.join(word_vectors)
-
-f = open('data/corpus/' + dataset + '_word_vectors.txt', 'w')
-f.write(string)
-f.close()
-
-word_vector_file = 'data/corpus/' + dataset + '_word_vectors.txt'
-_, embd, word_vector_map = loadWord2Vec(word_vector_file)
-word_embeddings_dim = len(embd[0])
-'''
-
-'''
-Word definitions end
-'''
-
-# label list
 label_set = set()
 for doc_meta in shuffle_doc_name_list:
     temp = doc_meta.split('\t')
@@ -224,12 +155,9 @@ with open('../data/corpus/' + dataset + '_labels.txt', 'w') as f:
     f.write(label_list_str)
 
 
-# x: feature vectors of training docs, no initial features
-# slect 90% training set
 train_size = len(train_ids)
 val_size = int(0.1 * train_size)
 real_train_size = train_size - val_size  # - int(0.5 * train_size)
-# different training rates
 
 real_train_doc_names = shuffle_doc_name_list[:real_train_size]
 real_train_doc_names_str = '\n'.join(real_train_doc_names)
@@ -259,7 +187,6 @@ for i in range(real_train_size):
         # np.random.uniform(-0.25, 0.25)
         data_x.append(doc_vec[j] / doc_len)  # doc_vec[j]/ doc_len
 
-# x = sp.csr_matrix((real_train_size, word_embeddings_dim), dtype=np.float32)
 x = sp.csr_matrix((data_x, (row_x, col_x)), shape=(
     real_train_size, word_embeddings_dim))
 
@@ -275,7 +202,6 @@ for i in range(real_train_size):
 y = np.array(y)
 print(y)
 
-# tx: feature vectors of test docs, no initial features
 test_size = len(test_ids)
 
 row_tx = []
@@ -313,9 +239,6 @@ for i in range(test_size):
 ty = np.array(ty)
 print(ty)
 
-# allx: the the feature vectors of both labeled and unlabeled training instances
-# (a superset of x)
-# unlabeled training instances -> words
 
 word_vectors = np.random.uniform(-0.01, 0.01,
                                  (vocab_size, word_embeddings_dim))
@@ -457,19 +380,6 @@ for key in word_pair_count:
 
 # word vector cosine similarity as weights
 
-'''
-for i in range(vocab_size):
-    for j in range(vocab_size):
-        if vocab[i] in word_vector_map and vocab[j] in word_vector_map:
-            vector_i = np.array(word_vector_map[vocab[i]])
-            vector_j = np.array(word_vector_map[vocab[j]])
-            similarity = 1.0 - cosine(vector_i, vector_j)
-            if similarity > 0.9:
-                print(vocab[i], vocab[j], similarity)
-                row.append(train_size + i)
-                col.append(train_size + j)
-                weight.append(similarity)
-'''
 # doc word frequency
 doc_word_freq = {}
 

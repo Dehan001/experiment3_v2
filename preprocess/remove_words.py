@@ -17,24 +17,16 @@ dataset = sys.argv[1]
 if dataset not in datasets:
 	sys.exit("wrong dataset name")
 
-# nltk.download('stopwords')
-# stop_words = set(stopwords.words('english'))
 nltk.download('stopwords')
 stop_words = set(stopwords.words('bengali'))
  
 print(stop_words)
 
-# Read Word Vectors
-# word_vector_file = 'data/glove.6B/glove.6B.200d.txt'
-# vocab, embd, word_vector_map = loadWord2Vec(word_vector_file)
-# word_embeddings_dim = len(embd[0])
-# dataset = '20ng'
 
 doc_content_list = []
-#with open('data/wiki_long_abstracts_en_text.txt', 'r') as f:
-with open('../data/corpus/' + dataset + '.txt', 'rb') as f:
+with open('../data/corpus/' + dataset + '.txt', 'r', encoding='utf-8') as f:
     for line in f.readlines():
-        doc_content_list.append(line.strip().decode('latin1'))
+        doc_content_list.append(line.strip())
 
 
 word_freq = {}  # to remove rare words
