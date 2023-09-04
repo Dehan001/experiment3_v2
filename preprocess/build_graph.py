@@ -86,7 +86,7 @@ with open('../data/' + dataset + '.test.index', 'w') as f:
     f.write(test_ids_str)
 
 
-ids = (train_ids + test_ids)-1
+ids = (train_ids + test_ids)
 print(ids)
 print(len(ids))
 
