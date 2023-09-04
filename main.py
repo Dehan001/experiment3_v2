@@ -25,9 +25,11 @@ def get_citation_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', type=bool, default=False,
                         help='Use CUDA training.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=200,
                         help='Number of epochs to train.')
-    parser.add_argument('--lr', type=float, default=1e-3,
+    # parser.add_argument('--lr', type=float, default=1e-3,
+    #                     help='Initial learning rate.')
+    parser.add_argument('--lr', type=float, default=0.002,
                         help='Initial learning rate.')
     parser.add_argument('--model', type=str, default="GCN",
                         choices=["GCN", "SAGE", "GAT"],
