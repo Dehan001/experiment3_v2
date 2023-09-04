@@ -80,23 +80,51 @@ def pre_adj(adj):
 
 adjdense = torch.from_numpy(pre_adj(adj).A.astype(np.float32))
 
-def construct_graph(adjacency):
-    g = DGLGraph()
+# def construct_graph(adjacency):
+#     g = DGLGraph()
+#     adj = pre_adj(adjacency)
+#     g.add_nodes(adj.shape[0])
+#     g.add_edges(adj.row, adj.col)
+#     adjdense = adj.A
+#     adjd = np.ones((adj.shape[0]))
+#     for i in range(adj.shape[0]):
+#         adjd[i] = adjd[i] * np.sum(adjdense[i, :])
+#     weight = torch.from_numpy(adj.data.astype(np.float32))
+#     g.ndata['d'] = torch.from_numpy(adjd.astype(np.float32))
+#     g.edata['w'] = weight
+
+#     if args.cuda:
+#         g.to(torch.device('cuda:0'))
+
+#     return g
+
+
+
+def construct_graph(adjacency, args):
     adj = pre_adj(adjacency)
-    g.add_nodes(adj.shape[0])
-    g.add_edges(adj.row,adj.col)
+    num_nodes = adj.shape[0]
+
+    # Create a graph using dgl.graph(data)
+    g = dgl.graph((adj.row, adj.col), num_nodes=num_nodes)
+    
     adjdense = adj.A
-    adjd = np.ones((adj.shape[0]))
-    for i in range(adj.shape[0]):
-        adjd[i] = adjd[i] * np.sum(adjdense[i,:])
+    adjd = np.ones((num_nodes,))
+    
+    for i in range(num_nodes):
+        adjd[i] = adjd[i] * np.sum(adjdense[i, :])
+    
     weight = torch.from_numpy(adj.data.astype(np.float32))
+    
+    # Set node and edge features
     g.ndata['d'] = torch.from_numpy(adjd.astype(np.float32))
     g.edata['w'] = weight
 
     if args.cuda:
         g.to(torch.device('cuda:0'))
-    
+
     return g
+
+
 
 class SimpleConv(nn.Module):
     def __init__(self,g,in_feats,out_feats,activation,feat_drop=True):
