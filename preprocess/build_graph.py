@@ -59,6 +59,9 @@ with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
         doc_content_list.append(line.strip())
 # print(doc_content_list)
 
+print(len(doc_name_list))
+print(len(doc_content_list))
+
 train_ids = []
 for train_name in doc_train_list:
     train_id = doc_name_list.index(train_name)
@@ -98,8 +101,6 @@ for id in ids:
 shuffle_doc_name_str = '\n'.join(shuffle_doc_name_list)
 shuffle_doc_words_str = '\n'.join(shuffle_doc_words_list)
 
-print(len(doc_name_list))
-print(len(doc_content_list))
 
 with open('../data/' + dataset + '_shuffle.txt', 'w') as f:
     f.write(shuffle_doc_name_str)
