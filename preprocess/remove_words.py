@@ -57,8 +57,8 @@ for doc_content in doc_content_list:
         #doc_str = temp
     clean_docs.append(doc_str)
 
-print(len(clean_docs))
-clean_corpus_str = '\n'.join(clean_docs)
+
+clean_corpus_str = '\n'.join(clean_docs[1:])
 
 
 #with open('../data/wiki_long_abstracts_en_text.clean.txt', 'w') as f:
@@ -70,6 +70,7 @@ min_len = 10000
 aver_len = 0
 max_len = 0 
 
+docs=[]
 #with open('../data/wiki_long_abstracts_en_text.txt', 'r') as f:
 with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
     lines = f.readlines()
@@ -81,6 +82,8 @@ with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
             min_len = len(temp)
         if len(temp) > max_len:
             max_len = len(temp)
+        docs.append(line)
+print(len(docs))
 
 aver_len = 1.0 * aver_len / len(lines)
 print('Number of lines:' + str(len(lines)))
