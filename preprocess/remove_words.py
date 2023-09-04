@@ -20,7 +20,8 @@ if dataset not in datasets:
 # nltk.download('stopwords')
 # stop_words = set(stopwords.words('english'))
 nltk.download('stopwords')
-stop_words = set(load_bangla_stopwords()) 
+stop_words = set(stopwords.words('bengali'))
+ 
 print(stop_words)
 
 # Read Word Vectors
