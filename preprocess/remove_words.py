@@ -11,7 +11,7 @@ from utils.utils import clean_str, loadWord2Vec
 if len(sys.argv) != 2:
 	sys.exit("Use: python remove_words.py <dataset>")
 
-datasets = ['Emotion']
+datasets = ['SentNOB']
 dataset = sys.argv[1]
 
 if dataset not in datasets:
@@ -55,7 +55,7 @@ for doc_content in doc_content_list:
     doc_words = []
     for word in words:
         # word not in stop_words and word_freq[word] >= 5
-        if dataset == 'Emotion':
+        if dataset == 'SentNOB':
             doc_words.append(word)
         elif word not in stop_words and word_freq[word] >= 5:
             doc_words.append(word)
