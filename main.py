@@ -204,7 +204,7 @@ class GATLayer(nn.Module):
         g.ndata['er'] = feat.mm(getattr(self, 'ar'))
         g.apply_edges(fn.u_add_v('el', 'er', 'e'))
         # message passing
-        g.update_all(fn.src_mul_edge('h', 'w', 'm'), fn.sum('m', 'h'))
+        g.update_all(fn.u_mul_e('h', 'w', 'm'), fn.sum('m', 'h'))
         e = F.leaky_relu(g.edata['e'])
         # compute softmax
         g.edata['w'] = F.softmax(e)
