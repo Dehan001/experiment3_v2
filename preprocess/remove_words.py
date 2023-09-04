@@ -28,7 +28,6 @@ with open('../data/corpus/' + dataset + '.txt', 'r', encoding='utf-8') as f:
     for line in f.readlines():
         doc_content_list.append(line.strip())
 
-print(len(doc_content_list))
 
 word_freq = {}  # to remove rare words
 
@@ -57,6 +56,8 @@ for doc_content in doc_content_list:
     #if doc_str == '':
         #doc_str = temp
     clean_docs.append(doc_str)
+
+print(len(clean_docs))
 
 clean_corpus_str = '\n'.join(clean_docs)
 
