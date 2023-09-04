@@ -146,7 +146,9 @@ class SimpleConv(nn.Module):
     def forward(self, feat):
         g = self.graph.local_var()
         g.ndata['h'] = feat.mm(getattr(self, 'W'))
-        g.update_all(fn.src_mul_edge(src='h', edge='w', out='m'), fn.sum(msg='m',out='h'))
+        # g.update_all(fn.src_mul_edge(src='h', edge='w', out='m'), fn.sum(msg='m',out='h'))
+        g.update_all(fn.u_mul_e(src='h', edge='w', out='m'), fn.sum(msg='m',out='h'))
+        
         rst = g.ndata['h']
         #rst = self.linear(rst)
         rst = self.activation(rst)
