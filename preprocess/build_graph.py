@@ -19,7 +19,7 @@ from utils.utils import loadWord2Vec, clean_str
 if len(sys.argv) != 2:
 	sys.exit("Use: python build_graph.py <dataset>")
 
-datasets = ['BanFake', 'mr']
+datasets = ['SarcasDetection', 'mr']
 dataset = sys.argv[1]
 
 if dataset not in datasets:
