@@ -2,7 +2,8 @@ import numpy as np
 import pickle as pkl
 import networkx as nx
 import scipy.sparse as sp
-from scipy.sparse.linalg.eigen.arpack import eigsh
+from scipy.sparse.linalg import eigs
+# from scipy.sparse.linalg.eigen.arpack import eigsh
 import sys
 import re
 
@@ -243,7 +244,9 @@ def chebyshev_polynomials(adj, k):
 
     adj_normalized = normalize_adj(adj)
     laplacian = sp.eye(adj.shape[0]) - adj_normalized
-    largest_eigval, _ = eigsh(laplacian, 1, which='LM')
+    # largest_eigval, _ = eigsh(laplacian, 1, which='LM')
+    largest_eigval, _ = eigs(laplacian, k=1, which='LM')
+
     scaled_laplacian = (
         2. / largest_eigval[0]) * laplacian - sp.eye(adj.shape[0])
 
