@@ -34,8 +34,8 @@ def get_citation_args():
                         help='model to use.')
     parser.add_argument('--early_stopping', type=int, default=10,
                         help='require early stopping.')
-    parser.add_argument('--dataset', type=str, default='SentNOB',
-                        choices = ['SentNOB', 'mr'],
+    parser.add_argument('--dataset', type=str, default='mr',
+                        choices = ['mr'],
                         help='dataset to train')
 
     args, _ = parser.parse_known_args()
