@@ -65,7 +65,7 @@ if args.cuda and torch.cuda.is_available():
 
 # Load data
 
-adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, test_size = load_corpus('mr')
+adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, test_size = load_corpus('Emotion')
 features = sp.identity(features.shape[0])
 features = preprocess_features(features)
 
