@@ -59,7 +59,7 @@ for doc_content in doc_content_list:
 
 
 clean_corpus_str = '\n'.join(clean_docs)
-
+print(len(clean_corpus_str))
 
 #with open('../data/wiki_long_abstracts_en_text.clean.txt', 'w') as f:
 with open('../data/corpus/' + dataset + '.clean.txt', 'w') as f:
