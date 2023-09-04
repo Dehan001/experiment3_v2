@@ -62,12 +62,9 @@ for doc_content in doc_content_list:
 clean_corpus_str = ""
 
 # Concatenate cleaned documents with newline characters
-c=0
 for doc in clean_docs:
-    
     clean_corpus_str += doc + '\n'
-    c+=1
-print(c)
+
 
 #with open('../data/wiki_long_abstracts_en_text.clean.txt', 'w') as f:
 with open('../data/corpus/' + dataset + '.clean.txt', 'w') as f:
@@ -91,7 +88,7 @@ with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
         if len(temp) > max_len:
             max_len = len(temp)
         docs.append(line)
-print(len(docs))
+
 
 aver_len = 1.0 * aver_len / len(lines)
 print('Number of lines:' + str(len(lines)))
