@@ -57,7 +57,6 @@ for doc_content in doc_content_list:
         #doc_str = temp
     clean_docs.append(doc_str)
 
-print(len(clean_docs))
 
 clean_corpus_str = '\n'.join(clean_docs)
 
@@ -84,6 +83,7 @@ with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
             max_len = len(temp)
 
 aver_len = 1.0 * aver_len / len(lines)
+print('Number of lines:' + len(lines))
 print('Min_len : ' + str(min_len))
 print('Max_len : ' + str(max_len))
 print('Average_len : ' + str(aver_len))
