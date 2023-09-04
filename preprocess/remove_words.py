@@ -58,8 +58,16 @@ for doc_content in doc_content_list:
     clean_docs.append(doc_str)
 
 
-clean_corpus_str = '\n'.join(clean_docs[0:])
-print(len(clean_corpus_str))
+# clean_corpus_str = '\n'.join(clean_docs)
+clean_corpus_str = ""
+
+# Concatenate cleaned documents with newline characters
+c=0
+for doc in clean_docs:
+    
+    clean_corpus_str += doc + '\n'
+    c+=1
+print(c)
 
 #with open('../data/wiki_long_abstracts_en_text.clean.txt', 'w') as f:
 with open('../data/corpus/' + dataset + '.clean.txt', 'w') as f:
