@@ -17,8 +17,10 @@ dataset = sys.argv[1]
 if dataset not in datasets:
 	sys.exit("wrong dataset name")
 
+# nltk.download('stopwords')
+# stop_words = set(stopwords.words('english'))
 nltk.download('stopwords')
-stop_words = set(stopwords.words('english'))
+stop_words = set(load_bangla_stopwords()) 
 print(stop_words)
 
 # Read Word Vectors
