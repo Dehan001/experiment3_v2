@@ -98,6 +98,9 @@ for id in ids:
 shuffle_doc_name_str = '\n'.join(shuffle_doc_name_list)
 shuffle_doc_words_str = '\n'.join(shuffle_doc_words_list)
 
+print(len(doc_name_list))
+print(len(doc_content_list))
+
 with open('../data/' + dataset + '_shuffle.txt', 'w') as f:
     f.write(shuffle_doc_name_str)
 
