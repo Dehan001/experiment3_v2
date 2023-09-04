@@ -100,7 +100,7 @@ adjdense = torch.from_numpy(pre_adj(adj).A.astype(np.float32))
 
 
 
-def construct_graph(adjacency, args):
+def construct_graph(adjacency):
     adj = pre_adj(adjacency)
     num_nodes = adj.shape[0]
 
