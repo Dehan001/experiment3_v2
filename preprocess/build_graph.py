@@ -19,7 +19,7 @@ from utils.utils import loadWord2Vec, clean_str
 if len(sys.argv) != 2:
 	sys.exit("Use: python build_graph.py <dataset>")
 
-datasets = ['BengaliHateSpeech', 'mr']
+datasets = ['Emotion', 'mr']
 # build corpus
 dataset = sys.argv[1]
 
