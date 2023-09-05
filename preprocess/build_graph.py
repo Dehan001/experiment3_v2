@@ -221,12 +221,12 @@ for i in range(test_size):
         row_tx.append(i)
         col_tx.append(j)
         # np.random.uniform(-0.25, 0.25)
-        data_tx.append(doc_vec[j] / doc_len)  # doc_vec[j] / doc_len
-        # if doc_len != 0 and not np.isnan(doc_len):
-        #     data_tx.append(doc_vec[j] / doc_len)
-        # else:
-        #     # Handle the case where division is not possible
-        #     data_tx.append(0.0)  # You can choose an appropriate default value
+        # data_tx.append(doc_vec[j] / doc_len)  # doc_vec[j] / doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_tx.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_tx.append(0.0)  # You can choose an appropriate default value
 
 # tx = sp.csr_matrix((test_size, word_embeddings_dim), dtype=np.float32)
 tx = sp.csr_matrix((data_tx, (row_tx, col_tx)),
