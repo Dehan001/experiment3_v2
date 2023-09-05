@@ -341,25 +341,24 @@ data_allx = np.array(data_allx)
 allx = sp.csr_matrix(
     (data_allx, (row_allx, col_allx)), shape=(train_size + vocab_size, word_embeddings_dim))
 
-# ally = []
-# for i in range(train_size):
-#     doc_meta = shuffle_doc_name_list[i]
-#     temp = doc_meta.split('\t')
-#     label = temp[2]
-#     one_hot = [0 for l in range(len(label_list))]
-#     label_index = label_list.index(label)
-#     one_hot[label_index] = 1
-#     ally.append(one_hot)
+ally = []
+for i in range(train_size):
+    doc_meta = shuffle_doc_name_list[i]
+    temp = doc_meta.split('\t')
+    label = temp[2]
+    one_hot = [0 for l in range(len(label_list))]
+    label_index = label_list.index(label)
+    one_hot[label_index] = 1
+    ally.append(one_hot)
 
-# for i in range(vocab_size):
-#     one_hot = [0 for l in range(len(label_list))]
-#     ally.append(one_hot)
+for i in range(vocab_size):
+    one_hot = [0 for l in range(len(label_list))]
+    ally.append(one_hot)
 
 # ally = np.array(ally)
 
 
-# Assuming ally is your combined one-hot encoded labels
-ally = []
+ally_bert = []
 
 # Convert one-hot encoded labels for training data
 for i in range(train_size):
@@ -372,7 +371,7 @@ for i in range(train_size):
     # Convert tokens to IDs
     label_ids = tokenizer.convert_tokens_to_ids(tokenized_label)
 
-    ally.append(label_ids)
+    ally_bert.append(label_ids)
 
 # Add one-hot encoded vectors for vocabulary
 for i in range(vocab_size):
@@ -385,10 +384,9 @@ for i in range(vocab_size):
     # Convert tokens to IDs
     one_hot_ids = tokenizer.convert_tokens_to_ids(tokenized_one_hot)
 
-    ally.append(one_hot_ids)
+    ally_bert.append(one_hot_ids)
 
-ally = np.array(ally)
-
+ally = np.array(ally_bert)
 
 print(x.shape, y.shape, tx.shape, ty.shape, allx.shape, ally.shape)
 
