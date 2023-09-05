@@ -341,52 +341,51 @@ data_allx = np.array(data_allx)
 allx = sp.csr_matrix(
     (data_allx, (row_allx, col_allx)), shape=(train_size + vocab_size, word_embeddings_dim))
 
+# ally = []
+# for i in range(train_size):
+#     doc_meta = shuffle_doc_name_list[i]
+#     temp = doc_meta.split('\t')
+#     label = temp[2]
+#     one_hot = [0 for l in range(len(label_list))]
+#     label_index = label_list.index(label)
+#     one_hot[label_index] = 1
+#     ally.append(one_hot)
+
+# for i in range(vocab_size):
+#     one_hot = [0 for l in range(len(label_list))]
+#     ally.append(one_hot)
+
+# ally = np.array(ally)
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(label_list))
+
 ally = []
+
+# Process training data
 for i in range(train_size):
     doc_meta = shuffle_doc_name_list[i]
     temp = doc_meta.split('\t')
     label = temp[2]
-    one_hot = [0 for l in range(len(label_list))]
-    label_index = label_list.index(label)
-    one_hot[label_index] = 1
-    ally.append(one_hot)
 
-for i in range(vocab_size):
-    one_hot = [0 for l in range(len(label_list))]
-    ally.append(one_hot)
+    # Step 3: Tokenize the text data using BERT tokenizer
+    text = temp[3]  # Assuming text data is in the fourth column
+    inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
 
-# ally = np.array(ally)
+    # Step 2: Use the BERT model to encode the text
+    outputs = model(**inputs)
+    logits = outputs.logits
 
+    # Append the BERT encoded features
+    ally.append(logits)
 
-ally_bert = []
+# # Process additional data (vocab_size)
+# for i in range(vocab_size):
+#     one_hot = [0] * len(label_list)
+#     ally.append(one_hot)
 
-# Convert one-hot encoded labels for training data
-for i in range(train_size):
-    label_indices = [idx for idx, val in enumerate(ally[i]) if val == 1]
-    label_text = ' '.join([label_list[idx] for idx in label_indices])
+# Convert to a NumPy array
+ally = np.array(ally)
 
-    # Tokenize the label text using the BERT tokenizer
-    tokenized_label = tokenizer.tokenize(label_text)
-
-    # Convert tokens to IDs
-    label_ids = tokenizer.convert_tokens_to_ids(tokenized_label)
-
-    ally_bert.append(label_ids)
-
-# Add one-hot encoded vectors for vocabulary
-for i in range(vocab_size):
-    one_hot_indices = [idx for idx, val in enumerate(ally[i + train_size]) if val == 1]
-    one_hot_text = ' '.join([label_list[idx] for idx in one_hot_indices])
-
-    # Tokenize the one-hot text using the BERT tokenizer
-    tokenized_one_hot = tokenizer.tokenize(one_hot_text)
-
-    # Convert tokens to IDs
-    one_hot_ids = tokenizer.convert_tokens_to_ids(tokenized_one_hot)
-
-    ally_bert.append(one_hot_ids)
-
-ally = np.array(ally_bert)
 
 print(x.shape, y.shape, tx.shape, ty.shape, allx.shape, ally.shape)
 
