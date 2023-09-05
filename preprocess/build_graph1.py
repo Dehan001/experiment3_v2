@@ -156,11 +156,17 @@ train_size = len(train_ids)
 val_size = int(0.1 * train_size)
 real_train_size = train_size - val_size  # - int(0.5 * train_size)
 
+# Define test_size
+test_size = len(test_ids)
+
+
 real_train_doc_names = shuffle_doc_name_list[:real_train_size]
 real_train_doc_names_str = '\n'.join(real_train_doc_names)
 
 with open('../data/' + dataset + '.real_train.name', 'w') as f:
     f.write(real_train_doc_names_str)
+
+
 
 # Initialize 'x' and 'tx' matrices with zeros.
 x = np.zeros((real_train_size, word_embeddings_dim))
