@@ -29,9 +29,9 @@ def get_citation_args():
                         help='Number of epochs to train.')
     # parser.add_argument('--lr', type=float, default=1e-3,
     #                     help='Initial learning rate.')
-    parser.add_argument('--lr', type=float, default=0.02,
+    parser.add_argument('--lr', type=float, default=0.002,
                         help='Initial learning rate.')
-    parser.add_argument('--model', type=str, default="GCN",
+    parser.add_argument('--model', type=str, default="GAT",
                         choices=["GCN", "SAGE", "GAT"],
                         help='model to use.')
     parser.add_argument('--early_stopping', type=int, default=10,
