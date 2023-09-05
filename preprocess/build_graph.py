@@ -185,7 +185,13 @@ for i in range(real_train_size):
         row_x.append(i)
         col_x.append(j)
         # np.random.uniform(-0.25, 0.25)
-        data_x.append(doc_vec[j] / doc_len)  # doc_vec[j]/ doc_len
+        # data_x.append(doc_vec[j] / doc_len)  # doc_vec[j]/ doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_x.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_x.append(0.0)  # You can choose an appropriate default value
+
 
 x = sp.csr_matrix((data_x, (row_x, col_x)), shape=(
     real_train_size, word_embeddings_dim))
