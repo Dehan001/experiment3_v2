@@ -9,31 +9,31 @@ from sklearn import svm
 from nltk.corpus import wordnet as wn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
+import torch
+from transformers import BertTokenizer, BertModel
+
+# Load the BERT tokenizer and model
+tokenizer = BertTokenizer.from_pretrained("csebuetnlp/banglabert")
+model = BertModel.from_pretrained("csebuetnlp/banglabert")
 
 import sys
 sys.path.append('../')
 from utils.utils import loadWord2Vec, clean_str
-from transformers import BertTokenizer, BertModel
-import torch
 
-# Check if you have the 'transformers' library installed for BERT embeddings.
-# You can install it using 'pip install transformers'.
+
 
 if len(sys.argv) != 2:
-    sys.exit("Use: python build_graph.py <dataset>")
+	sys.exit("Use: python build_graph.py <dataset>")
 
 datasets = ['SentNOB', 'mr']
 dataset = sys.argv[1]
 
 if dataset not in datasets:
-    sys.exit("wrong dataset name")
+	sys.exit("wrong dataset name")
 
-word_embeddings_dim = 768  # BERT embeddings have a dimension of 768
+word_embeddings_dim = 768
 word_vector_map = {}
 
-# Load BERT model and tokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
 
 doc_name_list = []
 doc_train_list = []
@@ -49,11 +49,13 @@ with open('../data/' + dataset + '.txt', 'r') as f:
         elif temp[1].find('train') != -1:
             doc_train_list.append(line.strip())
 
+
 doc_content_list = []
 with open('../data/corpus/' + dataset + '.clean.txt', 'r') as f:
     lines = f.readlines()
     for line in lines:
         doc_content_list.append(line.strip())
+
 
 print(len(doc_name_list))
 print(len(doc_content_list))
@@ -65,9 +67,11 @@ for train_name in doc_train_list:
 print(train_ids)
 random.shuffle(train_ids)
 
+
 train_ids_str = '\n'.join(str(index) for index in train_ids)
 with open('../data/' + dataset + '.train.index', 'w') as f:
     f.write(train_ids_str)
+
 
 test_ids = []
 for test_name in doc_test_list:
@@ -79,6 +83,7 @@ random.shuffle(test_ids)
 test_ids_str = '\n'.join(str(index) for index in test_ids)
 with open('../data/' + dataset + '.test.index', 'w') as f:
     f.write(test_ids_str)
+
 
 ids = (train_ids + test_ids)
 print(ids)
@@ -92,11 +97,14 @@ for id in ids:
 shuffle_doc_name_str = '\n'.join(shuffle_doc_name_list)
 shuffle_doc_words_str = '\n'.join(shuffle_doc_words_list)
 
+
 with open('../data/' + dataset + '_shuffle.txt', 'w') as f:
     f.write(shuffle_doc_name_str)
 
 with open('../data/corpus/' + dataset + '_shuffle.txt', 'w') as f:
     f.write(shuffle_doc_words_str)
+
+
 
 word_freq = {}
 word_set = set()
@@ -152,13 +160,10 @@ label_list_str = '\n'.join(label_list)
 with open('../data/corpus/' + dataset + '_labels.txt', 'w') as f:
     f.write(label_list_str)
 
+
 train_size = len(train_ids)
 val_size = int(0.1 * train_size)
 real_train_size = train_size - val_size  # - int(0.5 * train_size)
-
-# Define test_size
-test_size = len(test_ids)
-
 
 real_train_doc_names = shuffle_doc_name_list[:real_train_size]
 real_train_doc_names_str = '\n'.join(real_train_doc_names)
@@ -167,60 +172,183 @@ with open('../data/' + dataset + '.real_train.name', 'w') as f:
     f.write(real_train_doc_names_str)
 
 
-
-# Initialize 'x' and 'tx' matrices with zeros.
-x = np.zeros((real_train_size, word_embeddings_dim))
-tx = np.zeros((test_size, word_embeddings_dim))
-
-# Loop over the training data
+row_x = []
+col_x = []
+data_x = []
 for i in range(real_train_size):
+    doc_vec = np.array([0.0 for k in range(word_embeddings_dim)])
     doc_words = shuffle_doc_words_list[i]
-    inputs = tokenizer(doc_words, return_tensors="pt", padding=True, truncation=True)
-    outputs = model(**inputs)
-    embeddings = outputs.last_hidden_state.mean(dim=1)  # Mean pooling of BERT embeddings
-    x[i] = embeddings.detach().numpy()
+    words = doc_words.split()
+    doc_len = len(words)
+    for word in words:
+        if word in word_vector_map:
+            word_vector = word_vector_map[word]
+            # print(doc_vec)
+            # print(np.array(word_vector))
+            doc_vec = doc_vec + np.array(word_vector)
 
-# Loop over the test data
+    for j in range(word_embeddings_dim):
+        row_x.append(i)
+        col_x.append(j)
+        # np.random.uniform(-0.25, 0.25)
+        # data_x.append(doc_vec[j] / doc_len)  # doc_vec[j]/ doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_x.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_x.append(0.0)  # You can choose an appropriate default value
+
+
+x = sp.csr_matrix((data_x, (row_x, col_x)), shape=(
+    real_train_size, word_embeddings_dim))
+
+bert_embeddings = []
+
+for i in range(real_train_size):
+    doc_meta = shuffle_doc_name_list[i]
+    temp = doc_meta.split('\t')
+    label = temp[2]
+
+    # Assuming that shuffle_doc_words_list contains your text data
+    text = shuffle_doc_words_list[i]
+
+    # Tokenize the text and get BERT embeddings
+    tokens = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**tokens)
+        text_embedding = outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
+    bert_embeddings.append(text_embedding)
+
+# Convert the list of BERT embeddings to a NumPy array
+y = np.array(bert_embeddings)
+
+
+test_size = len(test_ids)
+
+row_tx = []
+col_tx = []
+data_tx = []
 for i in range(test_size):
+    doc_vec = np.array([0.0 for k in range(word_embeddings_dim)])
     doc_words = shuffle_doc_words_list[i + train_size]
-    inputs = tokenizer(doc_words, return_tensors="pt", padding=True, truncation=True)
-    outputs = model(**inputs)
-    embeddings = outputs.last_hidden_state.mean(dim=1)  # Mean pooling of BERT embeddings
-    tx[i] = embeddings.detach().numpy()
+    words = doc_words.split()
+    doc_len = len(words)
+    for word in words:
+        if word in word_vector_map:
+            word_vector = word_vector_map[word]
+            doc_vec = doc_vec + np.array(word_vector)
 
-# Remove one-hot encoding for labels
-y = np.array([label_list.index(doc_meta.split('\t')[2]) for doc_meta in shuffle_doc_name_list[:real_train_size]])
-ty = np.array([label_list.index(doc_meta.split('\t')[2]) for doc_meta in shuffle_doc_name_list[train_size:]])
+    for j in range(word_embeddings_dim):
+        row_tx.append(i)
+        col_tx.append(j)
+        # np.random.uniform(-0.25, 0.25)
+        # data_tx.append(doc_vec[j] / doc_len)  # doc_vec[j] / doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_tx.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_tx.append(0.0)  # You can choose an appropriate default value
 
-# Rest of your code for building the graph remains the same.
+# tx = sp.csr_matrix((test_size, word_embeddings_dim), dtype=np.float32)
+tx = sp.csr_matrix((data_tx, (row_tx, col_tx)),
+                   shape=(test_size, word_embeddings_dim))
 
-# Note: You may need to install additional libraries and preprocess your data accordingly for BERT embeddings.
+bert_embeddings_test = []
 
-# Initialize 'allx' and 'ally' matrices with zeros.
-allx = np.zeros((train_size + vocab_size, word_embeddings_dim))
-ally = np.zeros(train_size)
+for i in range(test_size):
+    doc_meta = shuffle_doc_name_list[i + train_size]
+    temp = doc_meta.split('\t')
+    label = temp[2]
 
-# Loop over the training data
-for i in range(train_size):
-    doc_words = shuffle_doc_words_list[i]
-    inputs = tokenizer(doc_words, return_tensors="pt", padding=True, truncation=True)
-    outputs = model(**inputs)
-    embeddings = outputs.last_hidden_state.mean(dim=1)  # Mean pooling of BERT embeddings
-    allx[i] = embeddings.detach().numpy()
-    # Assign labels (assuming integer labels)
-    ally[i] = label_list.index(doc_meta.split('\t')[2])
+    # Assuming that shuffle_doc_words_list contains your test text data
+    text = shuffle_doc_words_list[i + train_size]
 
-# Loop over the vocabulary
-for i in range(vocab_size):
-    # You can choose to leave the embeddings for vocabulary items as zeros or replace them with BERT embeddings
-    # allx[i + train_size] = np.zeros(word_embeddings_dim)  # Replace with zeros for vocabulary items
+    # Tokenize the text and get BERT embeddings
+    tokens = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**tokens)
+        text_embedding = outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
+    bert_embeddings_test.append(text_embedding)
+
+# Convert the list of BERT embeddings for the test dataset to a NumPy array
+ty = np.array(bert_embeddings_test)
+
+
+word_vectors = np.random.uniform(-0.01, 0.01,
+                                 (vocab_size, word_embeddings_dim))
+
+for i in range(len(vocab)):
     word = vocab[i]
     if word in word_vector_map:
-        inputs = tokenizer(word, return_tensors="pt", padding=True, truncation=True)
-        outputs = model(**inputs)
-        embeddings = outputs.last_hidden_state.mean(dim=1)  # Mean pooling of BERT embeddings
-        allx[i + train_size] = embeddings.detach().numpy()
+        vector = word_vector_map[word]
+        word_vectors[i] = vector
 
+row_allx = []
+col_allx = []
+data_allx = []
+
+for i in range(train_size):
+    doc_vec = np.array([0.0 for k in range(word_embeddings_dim)])
+    doc_words = shuffle_doc_words_list[i]
+    words = doc_words.split()
+    doc_len = len(words)
+    for word in words:
+        if word in word_vector_map:
+            word_vector = word_vector_map[word]
+            doc_vec = doc_vec + np.array(word_vector)
+
+    for j in range(word_embeddings_dim):
+        row_allx.append(int(i))
+        col_allx.append(j)
+        # np.random.uniform(-0.25, 0.25)
+        # data_allx.append(doc_vec[j] / doc_len)  # doc_vec[j]/doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_allx.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_allx.append(0.0)  # You can choose an appropriate default value
+
+for i in range(vocab_size):
+    for j in range(word_embeddings_dim):
+        row_allx.append(int(i + train_size))
+        col_allx.append(j)
+        data_allx.append(word_vectors.item((i, j)))
+
+
+row_allx = np.array(row_allx)
+col_allx = np.array(col_allx)
+data_allx = np.array(data_allx)
+
+allx = sp.csr_matrix(
+    (data_allx, (row_allx, col_allx)), shape=(train_size + vocab_size, word_embeddings_dim))
+
+bert_embeddings_train = []
+
+# Iterate through the training dataset
+for i in range(train_size):
+    doc_meta = shuffle_doc_name_list[i]
+    temp = doc_meta.split('\t')
+    label = temp[2]
+
+    # Assuming that shuffle_doc_words_list contains your training text data
+    text = shuffle_doc_words_list[i]
+
+    # Tokenize the text and get BERT embeddings
+    tokens = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**tokens)
+        text_embedding = outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
+    bert_embeddings_train.append(text_embedding)
+
+# Append zeros for the remaining vocabulary size
+for i in range(vocab_size):
+    bert_embeddings_train.append(np.zeros(768))  # Assuming BERT embeddings are of size 768
+
+# Convert the list of BERT embeddings for the training dataset to a NumPy array
+ally = np.array(bert_embeddings_train)
 
 
 
