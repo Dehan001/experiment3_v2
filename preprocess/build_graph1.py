@@ -9,7 +9,8 @@ from sklearn import svm
 from nltk.corpus import wordnet as wn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.spatial.distance import cosine
-from transformers import BertTokenizer
+from transformers import BertTokenizer, BertForSequenceClassification
+
 
 import sys
 sys.path.append('../')
@@ -356,8 +357,8 @@ allx = sp.csr_matrix(
 #     ally.append(one_hot)
 
 # ally = np.array(ally)
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(label_list))
+tokenizer = BertTokenizer.from_pretrained('csebuetnlp/banglabert')
+model = BertForSequenceClassification.from_pretrained('csebuetnlp/banglabert', num_labels=len(label_list))
 
 ally = []
 
