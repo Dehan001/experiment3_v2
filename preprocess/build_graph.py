@@ -267,7 +267,13 @@ for i in range(train_size):
         row_allx.append(int(i))
         col_allx.append(j)
         # np.random.uniform(-0.25, 0.25)
-        data_allx.append(doc_vec[j] / doc_len)  # doc_vec[j]/doc_len
+        # data_allx.append(doc_vec[j] / doc_len)  # doc_vec[j]/doc_len
+        if doc_len != 0 and not np.isnan(doc_len):
+            data_allx.append(doc_vec[j] / doc_len)
+        else:
+            # Handle the case where division is not possible
+            data_allx.append(0.0)  # You can choose an appropriate default value
+
 for i in range(vocab_size):
     for j in range(word_embeddings_dim):
         row_allx.append(int(i + train_size))
