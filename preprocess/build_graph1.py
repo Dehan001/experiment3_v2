@@ -369,7 +369,7 @@ for i in range(train_size):
     label = temp[2]
 
     # Step 3: Tokenize the text data using BERT tokenizer
-    text = temp[3]  # Assuming text data is in the fourth column
+    text = shuffle_doc_words_list[i] # Assuming text data is in the fourth column
     inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
 
     # Step 2: Use the BERT model to encode the text
