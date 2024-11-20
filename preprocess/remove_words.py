@@ -11,7 +11,7 @@ from utils.utils import clean_str, loadWord2Vec
 if len(sys.argv) != 2:
 	sys.exit("Use: python remove_words.py <dataset>")
 
-datasets = ['SentNOB']
+datasets = ['SentNOB' , 'Sarcasm', 'BanFake', 'Emotion','HateSpeech']
 dataset = sys.argv[1]
 
 if dataset not in datasets:
