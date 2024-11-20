@@ -37,7 +37,7 @@ def get_citation_args():
     parser.add_argument('--early_stopping', type=int, default=10,
                         help='require early stopping.')
     parser.add_argument('--dataset', type=str, default='SentNOB',
-                        choices = ['SentNOB','mr'],
+                        choices = ['SentNOB' , 'Sarcasm', 'BanFake', 'Emotion','HateSpeech'],
                         help='dataset to train')
 
     args, _ = parser.parse_known_args()
@@ -50,7 +50,8 @@ args = get_citation_args()
 # 	sys.exit("Use: python train.py <dataset>")
 
 
-#dataset = sys.argv[1]
+# dataset = sys.argv[1]
+args.dataset = sys.argv[1]
 
 # Set random seed
 # seed = random.randint(1, 200)
@@ -67,7 +68,7 @@ if args.cuda and torch.cuda.is_available():
 
 # Load data
 
-adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, test_size = load_corpus('SentNOB')
+adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, test_size = load_corpus(args.dataset)
 features = sp.identity(features.shape[0])
 features = preprocess_features(features)
 
