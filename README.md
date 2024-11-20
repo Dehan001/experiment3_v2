@@ -1,3 +1,5 @@
+<!--
+
 # Graph neural networks for text classification
 
 Graph neural networks has been widely used in natural language processing. Yao et al. (2019) proposed TextGCN that adopts graph convolutional networks (GCN) (Kipf and Welling, 2017) for text classification on heterogeneous graph. We implemented TextGCN based on [PyTorch](https://pytorch.org/) and [DGL](https://docs.dgl.ai/). Furthermore, we suggest that inductive learning and attention mechanism is crucial for text classification using graph neural networks. So we adopt GraphSAGE (Hamilton et al., 2017) and graph attention networks (GAT) (Velickovic et al., 2018) for this classification task.
@@ -74,3 +76,4 @@ Jian Tang, Meng Qu, and Qiaozhu Mei. Pte: Predictive text embedding through larg
 Petar Velickovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Lio, and Yoshua Bengio. Graph attention networks. In ICLR, 2018. 
 
 Liang Yao, Chengsheng Mao, and Yuan Luo. Graph convolutional networks for text classification. Proceedings of the AAAI Conference on Artificial Intelligence, 33:7370–7377, 2019.
+-->
